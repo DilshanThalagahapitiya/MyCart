@@ -102,6 +102,16 @@ struct ViewProductView: View {
                         .padding(.top, 16)
                     } // : Scroll view
                 } // : VStack
+                .alert(
+                    vm.alertTitle,
+                    isPresented: $vm.isAlertShown,
+                    actions: {
+                        Button("Ok", role: .cancel) {}
+                    },
+                    message: {
+                        Text(vm.alertMessage)
+                    }
+                )
             }//ScrollView
             .foregroundColor(.white)
             .padding(.horizontal, 16)
@@ -111,6 +121,7 @@ struct ViewProductView: View {
             }
         } // : ZStack
         .baseViewStyles()
+        
     }
 
     // MARK: - ADD TO CART API CALL.

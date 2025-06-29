@@ -14,7 +14,7 @@ struct CommonButton: View {
     let isFilled: Bool
     let isFullWidth: Bool
     @State var cornerRadius:CGFloat = 25
-    @State var buttonColor: Color? = .primaryColor
+    @State var buttonColor: Color? = .primaryButton
     @State var isImg: Bool?
     @State var imageName = ""
     @State var imageWidth: CGFloat = 24

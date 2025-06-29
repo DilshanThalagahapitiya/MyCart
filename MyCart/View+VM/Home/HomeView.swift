@@ -12,7 +12,6 @@ struct HomeView: View {
 
     @StateObject var vm = HomeVM()
     @Binding var hideTabBar: Bool
-    @State var selectedCategoryId: String = ""
     @State var offset: CGFloat = 0
     @State var lastOffset: CGFloat = 0
 
@@ -32,7 +31,7 @@ struct HomeView: View {
                         })
                         .onSubmit {
                             vm.triggerSearch()
-                            print("search categoryId: \(selectedCategoryId)")
+                            print("search categoryId: \(vm.selectedCategoryId)")
                             print("search q: \(vm.searchText)")
                         }
                         .submitLabel(.search)
@@ -46,18 +45,25 @@ struct HomeView: View {
                             .foregroundColor(.primary)
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack {
-                                CategoryButton(categoryName: "All", categoryId: "", selectedCategoryId: $selectedCategoryId, action: {
-                                    selectedCategoryId = ""
+                                CategoryButton(categoryName: "All", categoryId: "", selectedCategoryId: $vm.selectedCategoryId, action: {
+                                    vm.selectedCategoryId = ""
                                     vm.selectCategory(nil)
-                                    print(selectedCategoryId)
+                                    print(vm.selectedCategoryId)
+                                    
                                 })
+                                .onChange(of: vm.selectedCategoryId) { oldValue, newValue in
+                                    Task{ await getItemCards(categoryId: newValue, q: "")}
+                                }
 
                                 ForEach(Array($vm.ItemCategories.enumerated()), id: \.offset) { _, $item in
-                                    CategoryButton(categoryName: item.category ?? "", categoryId: item.id ?? "", selectedCategoryId: $selectedCategoryId, action: {
-                                        selectedCategoryId = item.id ?? ""
+                                    CategoryButton(categoryName: item.category ?? "", categoryId: item.id ?? "", selectedCategoryId: $vm.selectedCategoryId, action: {
+                                        vm.selectedCategoryId = item.id ?? ""
                                         vm.selectCategory(item)
-                                        print(selectedCategoryId)
+                                        print(vm.selectedCategoryId)
                                     })
+                                    .onChange(of: vm.selectedCategoryId) { oldValue, newValue in
+                                        Task{ await getItemCards(categoryId: newValue, q: "")}
+                                    }
                                 }
                             } // : HStack
                         } // : ScrollView
@@ -134,10 +140,20 @@ struct HomeView: View {
                 .foregroundColor(Color.secondaryText)
                 .task {
                     vm.fetchCategoriesWithCombine()
-                    vm.fetchProductsWithCombine(categoryId: selectedCategoryId == "" ? "" : String(selectedCategoryId))
-                    print(" count \(vm.ItemCards.count)")
+                    await getItemCards(categoryId: vm.selectedCategoryId, q: "")
+//                    vm.fetchProductsWithCombine(categoryId: selectedCategoryId == "" ? "" : String(selectedCategoryId))
+//                    print(" count \(vm.ItemCards.count)")
                 }
-
+                .onChange(of: vm.searchText) { value in
+                    vm.debouncedSearchValue = value
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                        if vm.debouncedSearchValue == value {
+                            Task {
+                                await getItemCards(categoryId: vm.selectedCategoryId, q: vm.searchText)
+                            }
+                        }
+                    }
+                }
             } //: Geometry
         } //: ZStack
         .navigationBarHidden(true)
@@ -152,7 +168,7 @@ struct HomeView: View {
 
     func getItemCards(categoryId: String = "", q: String = "") async {
         // MARK: - GET ITEM CARDS API CALL (Legacy - kept for backward compatibility)
-
+        vm.ItemCards.removeAll()
         await vm.fetchProducts(categoryId: categoryId, query: q)
     }
 

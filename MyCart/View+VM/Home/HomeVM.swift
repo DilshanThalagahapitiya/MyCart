@@ -10,7 +10,10 @@ import Combine
 
 class HomeVM: BaseVM {
     @Published var searchText: String = ""
+    @Published var debouncedSearchValue: String = ""
+
     @Published var navigationTitle: String = "Welcome to store!"
+    @Published var selectedCategoryId: String = ""
 
     @Published var ItemCategories: [Category] = []
     @Published var selectedItemCategory: Category? = nil
@@ -84,6 +87,7 @@ extension HomeVM {
                 },
                 receiveValue: { [weak self] categories in
                     self?.ItemCategories = categories
+                    print("Categorys \(categories)")
                     self?.showSuccessLogger(message: "Categories fetched successfully!")
                 }
             )
@@ -109,6 +113,8 @@ extension HomeVM {
                 },
                 receiveValue: { [weak self] products in
                     self?.ItemCards = products
+                    dump("Products \(products)")
+
                     self?.showSuccessLogger(message: "Products fetched successfully!")
                 }
             )

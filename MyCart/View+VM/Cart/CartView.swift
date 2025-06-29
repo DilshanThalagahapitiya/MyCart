@@ -69,8 +69,8 @@ struct CartView: View {
 
                                 CommonButton(
                                     title: "Clear Cart",
-                                    isFilled: false,
-                                    isFullWidth: false,
+                                    isFilled: true,
+                                    isFullWidth: true,
                                     buttonWidth: 120
                                 ) {
                                     clearCart()
@@ -78,8 +78,7 @@ struct CartView: View {
 
                                 Spacer()
                             }
-//                            .padding(.top, 16)
-                            .padding(.bottom, 32)
+                            .padding(.bottom, 64)
                         } else {
                             // Empty Cart State
                             VStack(spacing: 20) {

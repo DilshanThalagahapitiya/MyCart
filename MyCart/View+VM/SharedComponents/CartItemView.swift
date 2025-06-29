@@ -52,7 +52,7 @@ struct CartItemView: View {
                     onRemove(String(cartItemWrapper.checkoutProduct.productDetails?.id ?? 0))
                 }) {
                     Image(systemName: "trash")
-                        .foregroundColor(.red)
+                        .foregroundColor(Color.errorRed)
                         .font(.system(size: 16, weight: .medium))
                 }
             }
@@ -72,7 +72,7 @@ struct CartItemView: View {
                         }
                     }) {
                         Image(systemName: "minus.circle.fill")
-                            .foregroundColor(.blue)
+                            .foregroundColor(Color.primaryButton)
                             .font(.system(size: 20))
                     }
                     .disabled(cartItemWrapper.quantity <= 1)
@@ -86,7 +86,7 @@ struct CartItemView: View {
                         onUpdateQuantity(String(cartItemWrapper.checkoutProduct.productDetails?.id ?? 0), cartItemWrapper.quantity + 1)
                     }) {
                         Image(systemName: "plus.circle.fill")
-                            .foregroundColor(.blue)
+                            .foregroundColor(Color.primaryButton)
                             .font(.system(size: 20))
                     }
                 }
